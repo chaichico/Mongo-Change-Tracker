@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mongo Change Tracker</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --panel:#12161d;
+    --panel-2:#171c25;
+    --border:#232a35;
+    --text:#e6e9ef;
+    --text-dim:#8b94a3;
+    --accent:#59d9b3;
+    --insert:#59d9b3;
+    --update:#e8b654;
+    --replace:#6ea8ff;
+    --delete:#f2707a;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  header{
+    display:flex; align-items:center; gap:12px; padding:14px 20px;
+    border-bottom:1px solid var(--border); background:var(--panel);
+    flex-shrink:0;
+  }
+  header h1{ font-size:15px; font-weight:600; margin:0; letter-spacing:0.2px; }
+  header .sub{ font-size:12px; color:var(--text-dim); font-family:var(--mono); }
+  .pulse-wrap{ display:flex; align-items:center; gap:6px; margin-left:auto; font-size:12px; color:var(--text-dim); font-family:var(--mono); }
+  .pulse{ width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 0 rgba(89,217,179,0.6); animation:pulse 1.8s infinite; }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(89,217,179,0.55); }
+    70%{ box-shadow:0 0 0 8px rgba(89,217,179,0); }
+    100%{ box-shadow:0 0 0 0 rgba(89,217,179,0); }
+  }
+  .pulse.off{ background:var(--delete); animation:none; }
+
+  input, select, button{
+    font-family:var(--sans); font-size:12.5px; background:var(--panel-2); color:var(--text);
+    border:1px solid var(--border); border-radius:6px; padding:7px 10px; cursor:pointer;
+  }
+  input{ cursor:text; }
+  main{ flex:1; display:flex; min-height:0; }
+  .col{ overflow-y:auto; border-right:1px solid var(--border); }
+  .col:last-child{ border-right:none; }
+  #documents-col{ width:300px; flex-shrink:0; }
+  #timeline-col{ width:340px; flex-shrink:0; }
+  #detail-col{ flex:1; min-width:0; }
+
+  .col-header{
+    position:sticky; top:0; background:var(--panel); padding:10px 14px;
+    font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-dim);
+    border-bottom:1px solid var(--border); z-index:1;
+  }
+  .group-label{ padding:10px 14px 4px; font-size:11px; color:var(--text-dim); font-family:var(--mono); }
+
+  .doc-item, .event-item{
+    padding:10px 14px; cursor:pointer; border-bottom:1px solid var(--border);
+    transition:background .12s ease;
+  }
+  .doc-item:hover, .event-item:hover{ background:var(--panel-2); }
+  .doc-item.active, .event-item.active{ background:var(--panel-2); box-shadow:inset 3px 0 0 var(--accent); }
+
+  .doc-id{ font-family:var(--mono); font-size:12.5px; color:var(--text); }
+  .doc-subject{ font-size:12.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .doc-subject + .doc-id{ margin-top:3px; color:var(--text-dim); font-size:11px; }
+  .doc-meta{ margin-top:4px; display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-dim); }
+  .badge{
+    font-family:var(--mono); font-size:10px; padding:2px 6px; border-radius:4px;
+    text-transform:uppercase; letter-spacing:0.4px; font-weight:600;
+  }
+  .badge.insert{ background:rgba(89,217,179,0.15); color:var(--insert); }
+  .badge.update{ background:rgba(232,182,84,0.15); color:var(--update); }
+  .badge.replace{ background:rgba(110,168,255,0.15); color:var(--replace); }
+  .badge.delete{ background:rgba(242,112,122,0.15); color:var(--delete); }
+  .method-tag{ font-family:var(--mono); color:var(--text-dim); }
+
+  .empty{ padding:24px 16px; color:var(--text-dim); font-size:13px; line-height:1.6; }
+
+  #detail-col{ padding:20px 24px; }
+  .detail-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
+  .detail-head h2{ font-size:16px; margin:0; font-family:var(--mono); font-weight:600; }
+  .detail-time{ font-size:12px; color:var(--text-dim); margin-bottom:18px; font-family:var(--mono); }
+
+  .field-table{ width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px; margin-bottom:24px; }
+  .field-table th{ text-align:left; padding:6px 10px; color:var(--text-dim); font-weight:500; border-bottom:1px solid var(--border); font-size:11px; text-transform:uppercase; letter-spacing:0.4px; }
+  .field-table td{ padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .field-name{ color:var(--accent); white-space:nowrap; }
+  .val-before{ color:var(--delete); text-decoration:line-through; opacity:0.75; }
+  .val-after{ color:var(--insert); }
+
+  .section-title{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-dim); margin:0 0 10px; }
+
+  .template-box{ background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; }
+  .template-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  button{ background:var(--accent); color:#06231b; font-weight:600; border:none; }
+  button:disabled{ opacity:0.5; cursor:not-allowed; }
+  button.secondary{ background:var(--panel-2); color:var(--text); border:1px solid var(--border); }
+
+  .toggle-label{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-dim); cursor:pointer; }
+
+  .validate-result{ margin-top:14px; font-family:var(--mono); font-size:12.5px; }
+  .validate-result.valid{ color:var(--insert); }
+  .validate-result.invalid{ color:var(--delete); }
+  .err-list{ margin:8px 0 0; padding-left:18px; color:var(--text-dim); }
+  .err-list li{ margin-bottom:4px; }
+  .err-list code{ color:var(--update); }
+
+  .session-box{ background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:18px; }
+  .session-event{ padding:10px 0; border-bottom:1px solid var(--border); }
+  .session-event:last-child{ border-bottom:none; }
+  .muted{ color:var(--text-dim); }
+
+  pre.raw{ background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:var(--mono); font-size:12px; overflow-x:auto; color:var(--text-dim); }
+  .raw-line{ display:block; min-width:max-content; padding:1px 8px; margin:0 -8px; }
+  .raw-line.changed{ color:#b8f5d9; background:rgba(89,217,179,0.14); border-left:3px solid var(--accent); padding-left:5px; }
+  .raw-line.compare-changed{ color:#ffe7a3; background:rgba(232,182,84,0.18); border-left:3px solid var(--update); padding-left:5px; }
+  .compare-panel{ padding:20px 24px; }
+  .compare-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .compare-head h2{ margin:0; font-size:16px; font-family:var(--mono); }
+  .compare-note{ color:var(--text-dim); font-size:12px; }
+  .compare-grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; min-width:0; }
+  .compare-pane{ min-width:0; }
+  .compare-pane-title{ display:flex; align-items:center; gap:8px; margin-bottom:8px; color:var(--text-dim); font-size:11px; text-transform:uppercase; letter-spacing:.6px; }
+  .compare-pane-title strong{ color:var(--text); font-family:var(--mono); font-size:12px; text-transform:none; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .compare-drop{ min-height:260px; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--text-dim); border:1px dashed var(--border); border-radius:8px; background:var(--panel); padding:20px; font-size:12px; }
+  .compare-drop.drag-over{ border-color:var(--update); background:rgba(232,182,84,0.08); color:#ffe7a3; }
+  .compare-grid pre.raw{ max-height:calc(100vh - 180px); overflow:auto; }
+  .event-item[draggable="true"]{ cursor:grab; }
+  .event-item.dragging{ opacity:.5; }
+  .event-context-menu{ position:fixed; z-index:20; min-width:170px; padding:4px; background:var(--panel-2); border:1px solid var(--border); border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+  .event-context-menu button{ width:100%; text-align:left; background:transparent; color:var(--text); padding:8px 10px; border-radius:4px; font-weight:500; }
+  .event-context-menu button:hover{ background:var(--border); color:var(--accent); }
+
+  @media (max-width: 900px){
+    main{ flex-direction:column; overflow-y:auto; }
+    .col{ width:100% !important; border-right:none; border-bottom:1px solid var(--border); max-height:280px; }
+    #detail-col{ max-height:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mongo Change Tracker</h1>
+  <span class="sub">real-time change stream inspector</span>
+  <div class="pulse-wrap"><span class="pulse" id="pulse"></span><span id="pulse-label">connecting…</span></div>
+</header>
+
+<main>
+  <section class="col" id="documents-col">
+    <div class="col-header">Documents</div>
+    <div id="documents-list"><div class="empty">กำลังโหลด…</div></div>
+  </section>
+
+  <section class="col" id="timeline-col">
+    <div class="col-header">Event timeline</div>
+    <div id="timeline-list"><div class="empty">เลือก document ทางซ้ายเพื่อดู timeline ของการเปลี่ยนแปลง</div></div>
+  </section>
+
+  <section class="col" id="detail-col">
+    <div class="empty">เลือก event เพื่อดูรายละเอียด: ชื่อ method ที่เรียก, field ที่เปลี่ยน และเทียบกับ template ได้</div>
+  </section>
+</main>
+
+<script>
+const state = {
+  collection:null,
+  documentId:null,
+  eventId:null,
+  timelineEvents:new Map(),
+  compare:{ current:null, incoming:null },
+};
+
+function fmtTime(iso){
+  const d = new Date(iso);
+  return d.toLocaleString('th-TH', { hour12:false });
+}
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+function opBadge(op){ return `<span class="badge ${escapeHtml(op)}">${escapeHtml(op)}</span>`; }
+function jsonPreview(v){
+  if (v === null || v === undefined) return 'null';
+  if (typeof v === 'object') return JSON.stringify(v);
+  return String(v);
+}
+function isChangedPath(path, changedPaths){
+  if (!path) return false;
+  return changedPaths.some(changed => path === changed || path.startsWith(`${changed}.`) || changed.startsWith(`${path}.`));
+}
+function rawLine(text, changed, className='changed'){
+  return `<span class="raw-line${changed ? ` ${className}` : ''}">${escapeHtml(text)}</span>`;
+}
+function addTrailingComma(line){
+  return line.replace('</span>', ',</span>');
+}
+function renderJsonLines(value, path, level, prefix, changedPaths, highlightClass='changed'){
+  const indent = '  '.repeat(level);
+  const changed = highlightClass === 'compare-changed'
+    ? changedPaths.includes(path)
+    : isChangedPath(path, changedPaths);
+
+  if (Array.isArray(value)){
+    if (!value.length) return [rawLine(`${indent}${prefix}[]`, changed, highlightClass)];
+    const lines = [rawLine(`${indent}${prefix}[`, changed, highlightClass)];
+    value.forEach((item, index) => {
+      const childLines = renderJsonLines(item, `${path}.${index}`, level + 1, '', changedPaths, highlightClass);
+      const last = childLines.length - 1;
+      if (index < value.length - 1) childLines[last] = addTrailingComma(childLines[last]);
+      lines.push(...childLines);
+    });
+    lines.push(rawLine(`${indent}]`, changed, highlightClass));
+    return lines;
+  }
+
+  if (value && typeof value === 'object'){
+    const entries = Object.entries(value);
+    if (!entries.length) return [rawLine(`${indent}${prefix}{}`, changed, highlightClass)];
+    const lines = [rawLine(`${indent}${prefix}{`, changed, highlightClass)];
+    entries.forEach(([key, item], index) => {
+      const childPath = path ? `${path}.${key}` : key;
+      const childLines = renderJsonLines(item, childPath, level + 1, `${JSON.stringify(key)}: `, changedPaths, highlightClass);
+      const last = childLines.length - 1;
+      if (index < entries.length - 1) childLines[last] = addTrailingComma(childLines[last]);
+      lines.push(...childLines);
+    });
+    lines.push(rawLine(`${indent}}`, changed, highlightClass));
+    return lines;
+  }
+
+  return [rawLine(`${indent}${prefix}${JSON.stringify(value)}`, changed, highlightClass)];
+}
+function renderRawDocument(event){
+  if (!event.after) return '(document was deleted)';
+  const changedPaths = (event.changedFields || []).map(field => field.field);
+  return renderJsonLines(event.after, '', 0, '', changedPaths).join('');
+}
+function overlappingDiffPaths(left, right, path=''){
+  if (Array.isArray(left) && Array.isArray(right)){
+    const paths = [];
+    const overlapLength = Math.min(left.length, right.length);
+    for (let index = 0; index < overlapLength; index++){
+      paths.push(...overlappingDiffPaths(left[index], right[index], `${path}.${index}`));
+    }
+    return paths;
+  }
+  if (left && right && typeof left === 'object' && typeof right === 'object' && !Array.isArray(left) && !Array.isArray(right)){
+    const paths = [];
+    for (const key of Object.keys(left)){
+      if (!Object.prototype.hasOwnProperty.call(right, key)) continue;
+      const childPath = path ? `${path}.${key}` : key;
+      paths.push(...overlappingDiffPaths(left[key], right[key], childPath));
+    }
+    return paths;
+  }
+  return JSON.stringify(left) === JSON.stringify(right) || !path ? [] : [path];
+}
+function renderCompareDocument(event, changedPaths){
+  if (!event?.after) return '(document was deleted)';
+  return renderJsonLines(event.after, '', 0, '', changedPaths, 'compare-changed').join('');
+}
+
+async function loadDocuments(){
+  const res = await fetch('/api/documents');
+  const docs = await res.json();
+  const list = document.getElementById('documents-list');
+  if (!docs.length){ list.innerHTML = '<div class="empty">ยังไม่มีการเปลี่ยนแปลงที่ตรง filter ลองเรียก action จาก frontend หรือปรับ filter ดู</div>'; return; }
+
+  const groups = {};
+  for (const d of docs){ (groups[d.collection] ??= []).push(d); }
+
+  list.innerHTML = Object.entries(groups).map(([coll, items]) => `
+    <div class="group-label">${escapeHtml(coll)}</div>
+    ${items.map(d => `
+      <div class="doc-item ${state.collection===coll && state.documentId===d.documentId ? 'active':''}"
+           data-collection="${escapeHtml(coll)}" data-id="${escapeHtml(d.documentId)}">
+        <div class="doc-subject" title="${escapeHtml(d.subject || '')}">${escapeHtml(d.subject || 'Untitled document')}</div>
+        <div class="doc-id" title="${escapeHtml(d.documentId)}">${escapeHtml(d.documentId)}</div>
+        <div class="doc-meta">
+          ${opBadge(d.lastOperationType)}
+          <span class="method-tag">${escapeHtml(d.lastMethodName)}</span>
+          <span>· ${d.eventCount} event${d.eventCount>1?'s':''}</span>
+        </div>
+      </div>
+    `).join('')}
+  `).join('');
+
+  list.querySelectorAll('.doc-item').forEach(el => {
+    el.addEventListener('click', () => selectDocument(el.dataset.collection, el.dataset.id));
+  });
+}
+
+async function selectDocument(collection, documentId){
+  state.collection = collection; state.documentId = documentId; state.eventId = null;
+  await loadDocuments();
+  const res = await fetch(`/api/documents/${encodeURIComponent(collection)}/${encodeURIComponent(documentId)}/events`);
+  const events = await res.json();
+  state.timelineEvents = new Map(events.map(event => [String(event._id), event]));
+  state.compare = { current:null, incoming:null };
+  const list = document.getElementById('timeline-list');
+  list.innerHTML = events.map(e => `
+    <div class="event-item" draggable="true" data-id="${escapeHtml(e._id)}">
+      <div class="doc-meta" style="margin-top:0">
+        ${opBadge(e.operationType)}
+        <span class="method-tag">${escapeHtml(e.methodName)}</span>
+      </div>
+      <div class="doc-id" style="margin-top:4px; font-size:11.5px; color:var(--text-dim)">${fmtTime(e.timestamp)}</div>
+      <div style="margin-top:4px; font-size:11.5px; color:var(--text-dim)">${e.changedFields.length} field${e.changedFields.length!==1?'s':''} changed</div>
+    </div>
+  `).join('') || '<div class="empty">ไม่มี event</div>';
+
+  list.querySelectorAll('.event-item').forEach(el => {
+    el.addEventListener('click', () => selectEvent(el.dataset.id));
+    el.addEventListener('dragstart', event => {
+      event.dataTransfer.setData('text/event-id', el.dataset.id);
+      event.dataTransfer.effectAllowed = 'copy';
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+    el.addEventListener('contextmenu', event => {
+      event.preventDefault();
+      showEventContextMenu(el.dataset.id, event.clientX, event.clientY);
+    });
+  });
+}
+
+function closeEventContextMenu(){
+  document.querySelector('.event-context-menu')?.remove();
+}
+function showEventContextMenu(eventId, x, y){
+  closeEventContextMenu();
+  const menu = document.createElement('div');
+  menu.className = 'event-context-menu';
+  menu.innerHTML = '<button type="button">Compare event from here</button>';
+  menu.style.left = `${Math.min(x, window.innerWidth - 190)}px`;
+  menu.style.top = `${Math.min(y, window.innerHeight - 50)}px`;
+  menu.querySelector('button').addEventListener('click', () => {
+    closeEventContextMenu();
+    beginEventCompare(eventId);
+  });
+  document.body.appendChild(menu);
+}
+async function beginEventCompare(eventId){
+  const event = state.timelineEvents.get(String(eventId));
+  if (!event) return;
+  state.compare = { current:event, incoming:null };
+  renderComparePanel();
+}
+function renderComparePanel(){
+  const current = state.compare.current;
+  const incoming = state.compare.incoming;
+  if (!current) return;
+  const detail = document.getElementById('detail-col');
+  const paths = incoming ? overlappingDiffPaths(current.after, incoming.after) : [];
+  const currentRaw = incoming
+    ? renderCompareDocument(current, paths)
+    : renderRawDocument(current);
+  const incomingContent = incoming
+    ? `<pre class="raw">${renderCompareDocument(incoming, paths)}</pre>`
+    : '<div class="compare-drop" id="incoming-drop">Drag another timeline event here to compare</div>';
+
+  detail.innerHTML = `
+    <div class="compare-panel">
+      <div class="compare-head">
+        <div>
+          <h2>Compare events</h2>
+          <div class="compare-note">Overlapping fields with different values are highlighted in yellow.</div>
+        </div>
+        <button type="button" class="secondary" id="close-compare-btn">Close</button>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-pane">
+          <div class="compare-pane-title"><span class="badge update">Current</span><strong>${escapeHtml(current.methodName || current._id)}</strong></div>
+          <pre class="raw">${currentRaw}</pre>
+        </div>
+        <div class="compare-pane">
+          <div class="compare-pane-title"><span class="badge insert">Incoming</span><strong>${escapeHtml(incoming ? (incoming.methodName || incoming._id) : 'Drop an event')}</strong></div>
+          ${incomingContent}
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('close-compare-btn').addEventListener('click', () => {
+    state.compare = { current:null, incoming:null };
+    selectEvent(current._id);
+  });
+  const drop = document.getElementById('incoming-drop');
+  if (drop){
+    drop.addEventListener('dragover', event => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'copy';
+      drop.classList.add('drag-over');
+    });
+    drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+    drop.addEventListener('drop', event => {
+      event.preventDefault();
+      drop.classList.remove('drag-over');
+      const incomingId = event.dataTransfer.getData('text/event-id');
+      const incomingEvent = state.timelineEvents.get(String(incomingId));
+      if (!incomingEvent || String(incomingEvent._id) === String(current._id)) return;
+      state.compare.incoming = incomingEvent;
+      renderComparePanel();
+    });
+  }
+}
+
+async function selectEvent(eventId){
+  state.eventId = eventId;
+  document.querySelectorAll('.event-item').forEach(el => el.classList.toggle('active', el.dataset.id===eventId));
+
+  const res = await fetch(`/api/events/${eventId}`);
+  const ev = await res.json();
+  const detail = document.getElementById('detail-col');
+
+  const fieldsRows = ev.changedFields.map(f => `
+    <tr>
+      <td class="field-name">${escapeHtml(f.field)}</td>
+      <td class="val-before">${escapeHtml(jsonPreview(f.before))}</td>
+      <td class="val-after">${escapeHtml(jsonPreview(f.after))}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="3" style="color:var(--text-dim)">ไม่มี field ที่เปลี่ยน</td></tr>`;
+
+  detail.innerHTML = `
+    <div class="detail-head">
+      ${opBadge(ev.operationType)}
+      <h2>${escapeHtml(ev.methodName)}</h2>
+    </div>
+    <div class="detail-time">${escapeHtml(ev.collection)} · ${escapeHtml(ev.documentId)} · ${fmtTime(ev.timestamp)}</div>
+    <div class="detail-time">action source: ${escapeHtml(ev.action?.source || 'not mapped yet')}${ev.action?.logId ? ` · log ${escapeHtml(ev.action.logId)}` : ''}</div>
+
+    <p class="section-title">Changed fields</p>
+    <table class="field-table">
+      <thead><tr><th>field</th><th>before</th><th>after</th></tr></thead>
+      <tbody>${fieldsRows}</tbody>
+    </table>
+
+    <p class="section-title">Compare กับ template</p>
+    <div class="template-box">
+      <label class="toggle-label">
+        <input type="checkbox" id="template-toggle" />
+        เปิดเทียบข้อมูล (after) กับ JSON Schema template
+      </label>
+      <div id="template-controls" style="display:none; margin-top:12px;">
+        <div class="template-row">
+          <select id="template-select"><option value="">กำลังโหลด template…</option></select>
+          <button id="validate-btn">Validate</button>
+        </div>
+        <div id="validate-result"></div>
+      </div>
+    </div>
+
+    <p class="section-title" style="margin-top:24px;">Raw document (after)</p>
+    <pre class="raw">${renderRawDocument(ev)}</pre>
+  `;
+
+  const templateBox = detail.querySelector('.template-box');
+  if (templateBox) {
+    templateBox.previousElementSibling?.remove();
+    templateBox.remove();
+  }
+
+  const toggle = document.getElementById('template-toggle');
+  const controls = document.getElementById('template-controls');
+  if (!toggle) return;
+  toggle.addEventListener('change', async () => {
+    controls.style.display = toggle.checked ? 'block' : 'none';
+    if (toggle.checked) await populateTemplateSelect(ev.collection);
+  });
+
+  document.getElementById('validate-btn')?.addEventListener('click', async () => {
+    const templateId = document.getElementById('template-select').value;
+    if (!templateId) return;
+    const r = await fetch(`/api/events/${eventId}/validate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ templateId })
+    });
+    const result = await r.json();
+    const box = document.getElementById('validate-result');
+    if (result.valid){
+      box.innerHTML = `<div class="validate-result valid">✓ ตรงกับ template</div>`;
+    } else {
+      box.innerHTML = `<div class="validate-result invalid">✗ ไม่ตรงกับ template (${result.errors.length} ปัญหา)</div>
+        <ul class="err-list">${result.errors.map(e => `<li><code>${escapeHtml(e.path)}</code> — ${escapeHtml(e.message || e.type)}${e.expected !== undefined ? `, expected: <code>${escapeHtml(jsonPreview(e.expected))}</code>` : ''}${e.actual !== undefined ? `, actual: <code>${escapeHtml(jsonPreview(e.actual))}</code>` : ''}</li>`).join('')}</ul>`;
+    }
+  });
+}
+
+async function populateTemplateSelect(collection){
+  const sel = document.getElementById('template-select');
+  if (!state.templatesCache[collection]){
+    const res = await fetch(`/api/templates?collection=${encodeURIComponent(collection)}`);
+    state.templatesCache[collection] = await res.json();
+  }
+  const templates = state.templatesCache[collection];
+  sel.innerHTML = templates.length
+    ? templates.map(t => `<option value="${escapeHtml(t._id)}">${escapeHtml(t.actionName ? `${t.name} (${t.actionName})` : t.name)}</option>`).join('')
+    : `<option value="">ยังไม่มี template สำหรับ collection นี้</option>`;
+}
+
+function readFilters(){
+  state.filters = {
+    collection: document.getElementById('filter-collection').value.trim(),
+    methodName: document.getElementById('filter-action').value.trim(),
+    documentId: document.getElementById('filter-document').value.trim()
+  };
+}
+
+function setSessionStatus(text){
+  document.getElementById('session-status').textContent = text;
+}
+
+async function startCapture(){
+  readFilters();
+  const name = document.getElementById('capture-name').value.trim() || state.filters.methodName || 'manual-action';
+  const filters = {};
+  if (state.filters.collection) filters.collection = state.filters.collection;
+  if (state.filters.documentId) filters.documentId = state.filters.documentId;
+
+  const res = await fetch('/api/action-sessions/start', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, filters })
+  });
+  state.activeSession = await res.json();
+  document.getElementById('start-capture-btn').disabled = true;
+  document.getElementById('stop-capture-btn').disabled = false;
+  setSessionStatus(`Capturing: ${state.activeSession.name}`);
+}
+
+async function stopCapture(){
+  if (!state.activeSession?._id) return;
+  const ended = await fetch(`/api/action-sessions/${state.activeSession._id}/end`, { method:'POST' });
+  state.activeSession = await ended.json();
+  document.getElementById('start-capture-btn').disabled = false;
+  document.getElementById('stop-capture-btn').disabled = true;
+  await showSessionEvents(state.activeSession._id);
+}
+
+async function showSessionEvents(sessionId){
+  const res = await fetch(`/api/action-sessions/${sessionId}/events`);
+  const { session, events } = await res.json();
+  setSessionStatus(`Ended: ${session.name} · ${events.length} event${events.length!==1?'s':''}`);
+  document.getElementById('detail-col').innerHTML = `
+    <div class="session-box">
+      <p class="section-title">Action capture summary</p>
+      <div class="detail-head"><h2>${escapeHtml(session.name)}</h2></div>
+      <div class="detail-time">${fmtTime(session.startedAt)} - ${fmtTime(session.endedAt || new Date())}</div>
+      ${events.length ? events.map(e => `
+        <div class="session-event">
+          <div class="doc-meta" style="margin-top:0">${opBadge(e.operationType)} <span class="method-tag">${escapeHtml(e.methodName)}</span></div>
+          <div class="doc-id" style="margin-top:4px">${escapeHtml(e.collection)} / ${escapeHtml(e.documentId)}</div>
+          <div class="muted" style="margin-top:4px; font-size:12px">${(e.changedFields || []).map(f => escapeHtml(f.field)).join(', ') || 'no changed fields'}</div>
+        </div>
+      `).join('') : '<div class="empty">ไม่พบ event ในช่วง capture นี้ ลองใส่ document id/filter ให้น้อยลงหรือเช็ก WATCH_COLLECTIONS</div>'}
+    </div>
+  `;
+  await loadDocuments();
+}
+
+// --- live updates over SSE ---
+function connectStream(){
+  const es = new EventSource('/api/stream');
+  const pulse = document.getElementById('pulse');
+  const label = document.getElementById('pulse-label');
+  es.onopen = () => { pulse.classList.remove('off'); label.textContent = 'watching live'; };
+  es.onerror = () => { pulse.classList.add('off'); label.textContent = 'disconnected'; };
+  es.onmessage = () => {
+    loadDocuments();
+    if (state.collection && state.documentId) selectDocument(state.collection, state.documentId);
+  };
+}
+
+loadDocuments();
+connectStream();
+</script>
+</body>
+</html>
