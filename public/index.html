@@ -20,7 +20,12 @@
     --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
     --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
-  *{ box-sizing:border-box; }
+  *{ box-sizing:border-box; scrollbar-width:thin; scrollbar-color:#3a4656 transparent; }
+  *::-webkit-scrollbar{ width:9px; height:9px; }
+  *::-webkit-scrollbar-track{ background:transparent; }
+  *::-webkit-scrollbar-thumb{ background:#303b4a; border:2px solid transparent; border-radius:999px; background-clip:padding-box; }
+  *::-webkit-scrollbar-thumb:hover{ background:#59d9b3; border-color:transparent; background-clip:padding-box; }
+  *::-webkit-scrollbar-corner{ background:transparent; }
   html,body{ height:100%; margin:0; }
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
@@ -166,6 +171,9 @@
   .rename-input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(89,217,179,.12); }
   .rename-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
   .rename-actions button{ min-width:88px; }
+  .back-to-top{ position:fixed; right:18px; bottom:18px; z-index:16; display:flex; align-items:center; gap:7px; padding:8px 11px; background:rgba(18,22,29,.94); color:var(--text); border:1px solid #354252; border-radius:8px; box-shadow:0 10px 26px rgba(0,0,0,.4); backdrop-filter:blur(9px); font-family:var(--mono); font-size:11px; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .16s ease, transform .16s ease, border-color .16s ease; }
+  .back-to-top.visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .back-to-top:hover{ color:var(--accent); border-color:var(--accent); }
 
   @media (max-width: 900px){
     main{ flex-direction:column; overflow-y:auto; }
@@ -197,6 +205,7 @@
     <div class="empty">เลือก event เพื่อดูรายละเอียด: ชื่อ method ที่เรียก, field ที่เปลี่ยน และเทียบกับ template ได้</div>
   </section>
 </main>
+<button type="button" class="back-to-top" id="back-to-top-btn" title="Back to top">↑ <span>Top</span></button>
 
 <script>
 const state = {
@@ -346,14 +355,14 @@ function setupChangeNavigator(navId, preId, markerClass){
       groups.push({ lines:[line], end:lineIndex });
     }
   });
-  let active = groups.length ? 0 : -1;
+  let active = -1;
   const count = nav.querySelector('.change-count');
   const previous = nav.querySelector('[data-direction="previous"]');
   const next = nav.querySelector('[data-direction="next"]');
   const update = (shouldScroll = false) => {
-    count.textContent = groups.length ? `${active + 1} / ${groups.length}` : '0 / 0';
-    previous.disabled = groups.length < 2;
-    next.disabled = groups.length < 2;
+    count.textContent = active >= 0 ? `${active + 1} / ${groups.length}` : `0 / ${groups.length}`;
+    previous.disabled = groups.length === 0;
+    next.disabled = groups.length === 0;
     groups.forEach(group => group.lines.forEach(line => line.classList.remove('focus-line', 'focus-start', 'focus-end')));
     if (groups[active]) {
       groups[active].lines.forEach(line => line.classList.add('focus-line'));
@@ -370,9 +379,9 @@ function setupChangeNavigator(navId, preId, markerClass){
       });
     });
   });
-  previous.addEventListener('click', () => { active = (active - 1 + groups.length) % groups.length; update(true); });
-  next.addEventListener('click', () => { active = (active + 1) % groups.length; update(true); });
-  update(true);
+  previous.addEventListener('click', () => { active = active <= 0 ? groups.length - 1 : active - 1; update(true); });
+  next.addEventListener('click', () => { active = active < 0 ? 0 : (active + 1) % groups.length; update(true); });
+  update(false);
 }
 function removeFloatingChangeNavigators(){
   document.querySelectorAll('.change-nav.floating').forEach(nav => nav.remove());
@@ -663,6 +672,7 @@ async function selectEvent(eventId){
     <pre class="raw" id="event-raw-document">${renderRawDocument(ev)}</pre>
   `;
 
+  detail.scrollTop = 0;
   setupChangeNavigator('event-change-nav', 'event-raw-document', 'changed');
 
   const templateBox = detail.querySelector('.template-box');
@@ -783,6 +793,14 @@ function connectStream(){
 
 loadDocuments();
 connectStream();
+const detailPanel = document.getElementById('detail-col');
+const backToTopButton = document.getElementById('back-to-top-btn');
+detailPanel.addEventListener('scroll', () => {
+  backToTopButton.classList.toggle('visible', detailPanel.scrollTop > 240);
+});
+backToTopButton.addEventListener('click', () => {
+  detailPanel.scrollTo({ top:0, behavior:'smooth' });
+});
 </script>
 </body>
 </html>
