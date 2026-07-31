@@ -107,6 +107,13 @@ function buildSessionEventFilter(session) {
   return query;
 }
 
+function withPreciseChangedFields(event) {
+  if (!event || !Object.prototype.hasOwnProperty.call(event, "before") || !Object.prototype.hasOwnProperty.call(event, "after")) {
+    return event;
+  }
+  return { ...event, changedFields: watcher.deepDiff(event.before, event.after) };
+}
+
 async function main() {
   const { trackerDb } = await connect();
   await watcher.start();
@@ -174,14 +181,27 @@ async function main() {
       .find({ collection, documentId })
       .sort({ timestamp: -1 })
       .toArray();
-    res.json(list);
+    res.json(list.map(withPreciseChangedFields));
   });
 
   // --- Single event detail ---
   app.get("/api/events/:eventId", async (req, res) => {
     const event = await trackerDb.collection("change_events").findOne({ _id: new ObjectId(req.params.eventId) });
     if (!event) return res.status(404).json({ error: "Event not found" });
-    res.json(event);
+    res.json(withPreciseChangedFields(event));
+  });
+
+  app.patch("/api/events/:eventId", async (req, res) => {
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    if (name.length > 200) return res.status(400).json({ error: "Event name must be 200 characters or fewer" });
+    const eventId = new ObjectId(req.params.eventId);
+    const result = await trackerDb.collection("change_events").updateOne(
+      { _id: eventId },
+      { $set: { displayName: name || null } }
+    );
+    if (result.matchedCount === 0) return res.status(404).json({ error: "Event not found" });
+    const updated = await trackerDb.collection("change_events").findOne({ _id: eventId });
+    res.json(withPreciseChangedFields(updated));
   });
 
   // --- Templates: JSON Schemas used to validate a document's shape ---
@@ -248,7 +268,7 @@ async function main() {
       .find(buildSessionEventFilter(session))
       .sort({ timestamp: 1 })
       .toArray();
-    res.json({ session, events });
+    res.json({ session, events: events.map(withPreciseChangedFields) });
   });
 
   app.post("/api/action-sessions/:id/validate", async (req, res) => {
@@ -258,7 +278,7 @@ async function main() {
     const template = await trackerDb.collection("templates").findOne({ _id: new ObjectId(templateId) });
     if (!template) return res.status(404).json({ error: "Template not found" });
     const events = await trackerDb.collection("change_events").find(buildSessionEventFilter(session)).sort({ timestamp: 1 }).toArray();
-    const results = events.map((event) => ({ eventId: event._id, ...validateAgainstTemplate(event, template) }));
+    const results = events.map((event) => ({ eventId: event._id, ...validateAgainstTemplate(withPreciseChangedFields(event), template) }));
     res.json({ valid: results.length > 0 && results.every((result) => result.valid), results });
   });
 
@@ -270,7 +290,7 @@ async function main() {
     const template = await trackerDb.collection("templates").findOne({ _id: new ObjectId(templateId) });
     if (!template) return res.status(404).json({ error: "Template not found" });
 
-    res.json(validateAgainstTemplate(event, template));
+    res.json(validateAgainstTemplate(withPreciseChangedFields(event), template));
   });
 
   const port = process.env.PORT || 4400;

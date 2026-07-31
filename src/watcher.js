@@ -40,6 +40,20 @@ function isPlainObject(value) {
 function deepDiff(before, after, prefix = "") {
   if (stableStringify(before) === stableStringify(after)) return [];
 
+  if (Array.isArray(before) && Array.isArray(after)) {
+    const changed = [];
+    const length = Math.max(before.length, after.length);
+    for (let index = 0; index < length; index += 1) {
+      const path = prefix ? `${prefix}.${index}` : String(index);
+      changed.push(...deepDiff(before[index], after[index], path));
+    }
+    return changed;
+  }
+
+  if (Array.isArray(before) || Array.isArray(after)) {
+    return prefix ? [{ field: prefix, before: normalizeValue(before), after: normalizeValue(after) }] : [];
+  }
+
   const beforeIsObject = isPlainObject(before);
   const afterIsObject = isPlainObject(after);
 
@@ -310,4 +324,4 @@ async function start() {
   setInterval(poll, intervalMs);
 }
 
-module.exports = { start, bus };
+module.exports = { start, bus, deepDiff };
