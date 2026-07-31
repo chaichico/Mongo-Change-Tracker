@@ -120,6 +120,7 @@
 
   pre.raw{ background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px; font-family:var(--mono); font-size:12px; overflow-x:auto; color:var(--text-dim); }
   .raw-line{ display:block; min-width:max-content; padding:1px 8px; margin:0 -8px; }
+  .raw-line.changed{ cursor:pointer; }
   .raw-line-number{ display:inline-block; width:42px; margin-right:12px; color:#566273; text-align:right; user-select:none; }
   .raw-line.changed{ color:#b8f5d9; background:rgba(89,217,179,0.14); border-left:3px solid var(--accent); padding-left:5px; }
   .raw-line.compare-changed{ color:#ffe7a3; background:rgba(232,182,84,0.18); border-left:3px solid var(--update); padding-left:5px; }
@@ -349,7 +350,7 @@ function setupChangeNavigator(navId, preId, markerClass){
   const count = nav.querySelector('.change-count');
   const previous = nav.querySelector('[data-direction="previous"]');
   const next = nav.querySelector('[data-direction="next"]');
-  const update = () => {
+  const update = (shouldScroll = false) => {
     count.textContent = groups.length ? `${active + 1} / ${groups.length}` : '0 / 0';
     previous.disabled = groups.length < 2;
     next.disabled = groups.length < 2;
@@ -358,12 +359,20 @@ function setupChangeNavigator(navId, preId, markerClass){
       groups[active].lines.forEach(line => line.classList.add('focus-line'));
       groups[active].lines[0].classList.add('focus-start');
       groups[active].lines[groups[active].lines.length - 1].classList.add('focus-end');
-      focusChangeLine(pre, groups[active].lines[0]);
+      if (shouldScroll) focusChangeLine(pre, groups[active].lines[0]);
     }
   };
-  previous.addEventListener('click', () => { active = (active - 1 + groups.length) % groups.length; update(); });
-  next.addEventListener('click', () => { active = (active + 1) % groups.length; update(); });
-  update();
+  groups.forEach((group, groupIndex) => {
+    group.lines.forEach(line => {
+      line.addEventListener('click', () => {
+        active = groupIndex;
+        update(false);
+      });
+    });
+  });
+  previous.addEventListener('click', () => { active = (active - 1 + groups.length) % groups.length; update(true); });
+  next.addEventListener('click', () => { active = (active + 1) % groups.length; update(true); });
+  update(true);
 }
 function removeFloatingChangeNavigators(){
   document.querySelectorAll('.change-nav.floating').forEach(nav => nav.remove());

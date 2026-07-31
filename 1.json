@@ -1,0 +1,781 @@
+{
+  "_id": "6a6c17d99022c8d5cf2ecd0b",
+  "Audit": {
+    "CreatedDate": [
+      {
+        "low": 1497919792,
+        "high": 148827887,
+        "unsigned": false
+      },
+      420
+    ],
+    "CreatedIP": "127.0.0.1",
+    "CreatedUser": "user004300052@cmu.ac.th",
+    "UpdatedDate": [
+      {
+        "low": -1343528580,
+        "high": 148827919,
+        "unsigned": false
+      },
+      420
+    ],
+    "UpdatedIP": "127.0.0.1",
+    "UpdatedUser": "user000500682@cmu.ac.th"
+  },
+  "Content": {
+    "Description": "รายละเอียดแบบฟอร์มสัมมนา",
+    "DocumentDate": null,
+    "DocumentOrderNumber": "",
+    "FullDocumentNumber": "",
+    "Keyword": "การอบรม;การพัฒนา",
+    "OrganizationAddress": "",
+    "Overview": "",
+    "Recipient": "ชัยเวทย์ เขตเมืองมูล",
+    "ReferenceDetail": "",
+    "Subject": "ทดสอบ การสร้างหนังสือส่ง tracker111",
+    "Attachments": [
+      {
+        "ActiveStatus": 1,
+        "ActiveStatusSignFile": 0,
+        "CancelDate": null,
+        "CancelReason": "",
+        "CancelStatus": 0,
+        "CancelUser": "",
+        "FileNameS3": "25690731_79285F-0DC-F2F_27e6ac14-c4dc-473a-81aa-ee4c022f4bf6.pdf",
+        "FileType": ".pdf",
+        "FolderNameS3": "edocv3/document_file/66",
+        "FullPath": "edocv3/document_file/66",
+        "_id": "27e6ac14-c4dc-473a-81aa-ee4c022f4bf6",
+        "ObjectURLS3": "https://mis-edocv3-dev.s3.ap-southeast-7.amazonaws.com/edocv3/document_file/66/25690731_79285F-0DC-F2F_27e6ac14-c4dc-473a-81aa-ee4c022f4bf6.pdf",
+        "OrderDisplay": 1,
+        "OriginalFileName": "บริจาคเลือด.pdf",
+        "RegistrationId": null,
+        "SignFileDate": null,
+        "SignFileIP": "",
+        "SignFileUser": "",
+        "SignStatus": 0,
+        "StoredFileName": "25690731_79285F-0DC-F2F_27e6ac14-c4dc-473a-81aa-ee4c022f4bf6",
+        "Audit": {
+          "CreatedDate": [
+            {
+              "low": -1843952027,
+              "high": 148827887,
+              "unsigned": false
+            },
+            420
+          ],
+          "CreatedIP": "",
+          "CreatedUser": "",
+          "UpdatedDate": null,
+          "UpdatedIP": "",
+          "UpdatedUser": ""
+        },
+        "DocumentAttachmentSigner": []
+      },
+      {
+        "ActiveStatus": 1,
+        "ActiveStatusSignFile": 0,
+        "CancelDate": null,
+        "CancelReason": "",
+        "CancelStatus": 0,
+        "CancelUser": "",
+        "FileNameS3": "25690731_79285F-0DC-F2F_33a75d6a-cb19-44a0-b40d-8e7a3d8af182.png",
+        "FileType": ".png",
+        "FolderNameS3": "edocv3/document_file/66",
+        "FullPath": "edocv3/document_file/66",
+        "_id": "33a75d6a-cb19-44a0-b40d-8e7a3d8af182",
+        "ObjectURLS3": "https://mis-edocv3-dev.s3.ap-southeast-7.amazonaws.com/edocv3/document_file/66/25690731_79285F-0DC-F2F_33a75d6a-cb19-44a0-b40d-8e7a3d8af182.png",
+        "OrderDisplay": 2,
+        "OriginalFileName": "image (3).png",
+        "RegistrationId": null,
+        "SignFileDate": null,
+        "SignFileIP": "",
+        "SignFileUser": "",
+        "SignStatus": 0,
+        "StoredFileName": "25690731_79285F-0DC-F2F_33a75d6a-cb19-44a0-b40d-8e7a3d8af182",
+        "Audit": {
+          "CreatedDate": [
+            {
+              "low": -1843024254,
+              "high": 148827887,
+              "unsigned": false
+            },
+            420
+          ],
+          "CreatedIP": "",
+          "CreatedUser": "",
+          "UpdatedDate": null,
+          "UpdatedIP": "",
+          "UpdatedUser": ""
+        },
+        "DocumentAttachmentSigner": []
+      }
+    ],
+    "DocumentReferences": [],
+    "DocumentTemplate": {
+      "Description": "",
+      "Id": 1,
+      "Name": "แบบฟอร์มการอนุมัติโครงการสัมมนา"
+    }
+  },
+  "Deletion": {
+    "DeletedDate": null,
+    "DeletedIP": "",
+    "DeletedUser": "",
+    "DeletedUserFullName": "",
+    "DeletionStatus": 1
+  },
+  "Header": {
+    "DocumentCode": "79285F-0DC-F2F",
+    "GovernmentOwner": "สำนักบริการเทคโนโลยีสารสนเทศ",
+    "OwnerEmployeeFullName": "นายธีรกิติ์ เกียรติเกษม",
+    "OwnerEmployeeId": "6D2C2847-87E1-4AD3-BF9B-1DDAFC4FDD4E",
+    "Year": "2569",
+    "CreateType": {
+      "Id": 1,
+      "Name": "หนังสือส่ง",
+      "NameEn": "ForSend"
+    },
+    "DocumentIssueLevel": {
+      "Id": 1,
+      "Name": "ส่วนงานตนเอง",
+      "NameEn": "Organization"
+    },
+    "DocumentRegistration": null,
+    "DocumentType": {
+      "CodeNumber": "อว8394(2)/",
+      "DocumentNumberId": 5,
+      "DocumentNumberName": "หนังสือภายนอก (ใช้ส่งออก)",
+      "Id": 1,
+      "IsOutNumber": true,
+      "Name": "แบบหนังสือภายนอก (กระดาษตราครุฑ)",
+      "Year": "2569"
+    },
+    "OwnerType": {
+      "Id": 2,
+      "Name": "องค์กร",
+      "NameEn": "Organization"
+    },
+    "PriorityLevel": {
+      "Id": 4,
+      "Name": "ด่วนที่สุด",
+      "NameEn": "Most Urgent"
+    },
+    "RoleEdocOrganization": {
+      "EdocOrganizationId": 66,
+      "Level": 1,
+      "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+      "NameEn": "",
+      "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+      "ParentId": 0,
+      "TokenId": "66"
+    },
+    "SecurityLevel": {
+      "Id": 1,
+      "Name": "ปกติ",
+      "NameEn": "Normal"
+    }
+  },
+  "Number": {
+    "ExternalDispatch": {
+      "DispatchNumber": "1",
+      "DispatchNumberStatus": 1,
+      "DispatchedDate": [
+        {
+          "low": 506998016,
+          "high": 148827918,
+          "unsigned": false
+        },
+        420
+      ],
+      "DispatchedIP": "127.0.0.1",
+      "DispatchedUser": "user004300052@cmu.ac.th",
+      "DispatchedUserFullName": "นายธีรกิติ์ เกียรติเกษม",
+      "DocumentNumberId": 5,
+      "FullDocumentNumber": "อว8394(2)/1",
+      "_id": "6a6c4b789022c8d5cf2ecfdc",
+      "Audit": {
+        "CreatedDate": [
+          {
+            "low": 506997953,
+            "high": 148827918,
+            "unsigned": false
+          },
+          420
+        ],
+        "CreatedIP": "",
+        "CreatedUser": "",
+        "UpdatedDate": null,
+        "UpdatedIP": "",
+        "UpdatedUser": ""
+      }
+    },
+    "Registrations": [
+      {
+        "AcknowledgedDate": [
+          {
+            "low": -1302564187,
+            "high": 148827919,
+            "unsigned": false
+          },
+          420
+        ],
+        "AcknowledgedIP": "127.0.0.1",
+        "AcknowledgedUser": "user000500682@cmu.ac.th",
+        "AcknowledgedUserFullName": "นางสาวอำนวน สิรินทิพย์",
+        "DocumentActionId": 2,
+        "_id": "6a6c4d4d9022c8d5cf2ed066",
+        "OpenedDate": [
+          {
+            "low": -1344477563,
+            "high": 148827919,
+            "unsigned": false
+          },
+          420
+        ],
+        "OpenedIP": "127.0.0.1",
+        "OpenedUser": "user000500682@cmu.ac.th",
+        "OpenedUserFullName": "นางสาวอำนวน สิรินทิพย์",
+        "Overview": "",
+        "ReceiptNumber": 0,
+        "ReceiverType": 1,
+        "RegisteredDate": null,
+        "RegisteredIP": "",
+        "RegisteredUser": "",
+        "RegisteredUserFullName": "",
+        "RegistrationStatus": 1,
+        "RejectAcknowledgedDate": null,
+        "RejectAcknowledgedIP": "",
+        "RejectAcknowledgedUser": "",
+        "RejectAcknowledgedUserFullName": "",
+        "RejectMessage": "",
+        "RejectOpenedDate": null,
+        "RejectOpenedIP": "",
+        "RejectOpenedUser": "",
+        "RejectOpenedUserFullName": "",
+        "RejectedDate": null,
+        "RejectedIP": "",
+        "RejectedUser": "",
+        "RejectedUserFullName": "",
+        "SourceRecipientId": "6a6c4d449022c8d5cf2ed041",
+        "SourceReplyForwardId": "",
+        "SourceSelectionId": "",
+        "Audit": {
+          "CreatedDate": [
+            {
+              "low": 901303531,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "CreatedIP": "127.0.0.1",
+          "CreatedUser": "user004300052@cmu.ac.th",
+          "UpdatedDate": [
+            {
+              "low": -1302564187,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "UpdatedIP": "127.0.0.1",
+          "UpdatedUser": "user000500682@cmu.ac.th"
+        },
+        "DocumentReceiveNumber": null,
+        "RegistrationExternalStatus": {
+          "Id": 0,
+          "Name": "",
+          "NameEn": ""
+        },
+        "RegistrationExternalWorkflowStep": {
+          "Id": 0,
+          "Name": "",
+          "NameEn": ""
+        },
+        "RoleOrganization": {
+          "EdocOrganizationId": 66,
+          "Level": 0,
+          "Name": "",
+          "NameEn": "",
+          "OrganizationHRId": "",
+          "ParentId": null,
+          "TokenId": ""
+        },
+        "SenderOrganization": {
+          "EdocOrganizationId": 66,
+          "Level": 0,
+          "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+          "NameEn": "",
+          "OrganizationHRId": "",
+          "ParentId": null,
+          "TokenId": ""
+        }
+      }
+    ]
+  },
+  "Receiver": {
+    "DispatchSelections": [
+      {
+        "DispatchSelectionStatus": 1,
+        "DispatchedByUserFullName": "",
+        "DispatchedByUserId": "",
+        "DispatchedDate": null,
+        "DispatchedIP": "",
+        "_id": "6a6c4d269022c8d5cf2ed029",
+        "ReceiverTargetIds": [],
+        "Audit": {
+          "CreatedDate": [
+            {
+              "low": 509580330,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "CreatedIP": "127.0.0.1",
+          "CreatedUser": "user004300052@cmu.ac.th",
+          "UpdatedDate": [
+            {
+              "low": 822166121,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "UpdatedIP": "127.0.0.1",
+          "UpdatedUser": "user004300052@cmu.ac.th"
+        },
+        "Recipients": [
+          {
+            "EdocOrganizationId": 66,
+            "EdocOrganizationName": "",
+            "GroupReceiverId": 0,
+            "GroupReceiverName": "",
+            "OrderDisplay": 1,
+            "PositionName": "นักจัดการงานทั่วไป",
+            "ReceiverEmail": "user000500682@cmu.ac.th",
+            "ReceiverFullName": "นางสาวอำนวน สิรินทิพย์",
+            "ReceiverId": "72E4A8EF-DD3D-4B52-97BE-027ADE0FE04E",
+            "ReceiverType": 1,
+            "SourceProcessReceiverId": "72E4A8EF-DD3D-4B52-97BE-027ADE0FE04E",
+            "SourceReceiverTargetId": null
+          }
+        ],
+        "SelectedAttachments": [
+          {
+            "AttachmentId": "27e6ac14-c4dc-473a-81aa-ee4c022f4bf6",
+            "FileNameS3": "25690731_79285F-0DC-F2F_27e6ac14-c4dc-473a-81aa-ee4c022f4bf6.pdf",
+            "FileType": ".pdf",
+            "FolderNameS3": "edocv3/document_file/66",
+            "ObjectURLS3": "https://mis-edocv3-dev.s3.ap-southeast-7.amazonaws.com/edocv3/document_file/66/25690731_79285F-0DC-F2F_27e6ac14-c4dc-473a-81aa-ee4c022f4bf6.pdf",
+            "OrderDisplay": 0,
+            "OriginalFileName": "บริจาคเลือด.pdf",
+            "StoredFileName": "25690731_79285F-0DC-F2F_27e6ac14-c4dc-473a-81aa-ee4c022f4bf6"
+          },
+          {
+            "AttachmentId": "33a75d6a-cb19-44a0-b40d-8e7a3d8af182",
+            "FileNameS3": "25690731_79285F-0DC-F2F_33a75d6a-cb19-44a0-b40d-8e7a3d8af182.png",
+            "FileType": ".png",
+            "FolderNameS3": "edocv3/document_file/66",
+            "ObjectURLS3": "https://mis-edocv3-dev.s3.ap-southeast-7.amazonaws.com/edocv3/document_file/66/25690731_79285F-0DC-F2F_33a75d6a-cb19-44a0-b40d-8e7a3d8af182.png",
+            "OrderDisplay": 1,
+            "OriginalFileName": "image (3).png",
+            "StoredFileName": "25690731_79285F-0DC-F2F_33a75d6a-cb19-44a0-b40d-8e7a3d8af182"
+          }
+        ],
+        "SelectedMessages": [
+          {
+            "Message": "เยี่ยมยอด",
+            "OrderDisplay": 1,
+            "SourceDocumentReceiverId": "6a6c1b399022c8d5cf2ece05",
+            "SourceMessageEventType": 2
+          }
+        ]
+      }
+    ],
+    "Recipients": [
+      {
+        "DocumentAction": 1,
+        "_id": "6a6c1b399022c8d5cf2ece05",
+        "Audit": {
+          "CreatedDate": [
+            {
+              "low": 1549166679,
+              "high": 148827889,
+              "unsigned": false
+            },
+            420
+          ],
+          "CreatedIP": "127.0.0.1",
+          "CreatedUser": "user004300052@cmu.ac.th",
+          "UpdatedDate": [
+            {
+              "low": 611401645,
+              "high": 148827908,
+              "unsigned": false
+            },
+            420
+          ],
+          "UpdatedIP": "127.0.0.1",
+          "UpdatedUser": "user000500682@cmu.ac.th"
+        },
+        "OpinionRequestRouting": {
+          "CanceledDate": null,
+          "OpinionResponseStatus": 0,
+          "OpinionResponseStatusName": "รอให้ความคิดเห็น",
+          "ParentReceiverId": null,
+          "RequestRefId": "",
+          "RequestedDate": [
+            {
+              "low": 1549123264,
+              "high": 148827889,
+              "unsigned": false
+            },
+            420
+          ],
+          "RoundRef": 0
+        },
+        "OpinionRequests": [],
+        "ReceiverInfo": {
+          "DocumentReceiverId": "6a6c1b399022c8d5cf2ece04",
+          "IsCompleteProcess": null,
+          "OrderDisplay": 1,
+          "PositionName": "นักจัดการงานทั่วไป",
+          "ReceiverEmail": "user000500682@cmu.ac.th",
+          "ReceiverFullName": "นางสาวอำนวน สิรินทิพย์",
+          "ReceiverId": "72E4A8EF-DD3D-4B52-97BE-027ADE0FE04E",
+          "RegistrationId": null,
+          "ApproveStatus": {
+            "Id": 1,
+            "Name": "ตรวจสอบ/ดำเนินการ",
+            "NameEn": "Check/Action"
+          },
+          "DocumentApprovalStatus": {
+            "Id": 3,
+            "Name": "ผ่าน",
+            "NameEn": "Verified"
+          },
+          "DocumentEvents": [
+            {
+              "EventDate": [
+                {
+                  "low": 480957239,
+                  "high": 148827908,
+                  "unsigned": false
+                },
+                420
+              ],
+              "EventIP": "127.0.0.1",
+              "EventType": 1,
+              "EventUser": "user000500682@cmu.ac.th",
+              "EventUserFullName": "นางสาวอำนวน สิรินทิพย์",
+              "Message": "",
+              "AttachmentEvent": []
+            },
+            {
+              "EventDate": [
+                {
+                  "low": 611182315,
+                  "high": 148827908,
+                  "unsigned": false
+                },
+                420
+              ],
+              "EventIP": "127.0.0.1",
+              "EventType": 2,
+              "EventUser": "72E4A8EF-DD3D-4B52-97BE-027ADE0FE04E",
+              "EventUserFullName": "",
+              "Message": "เยี่ยมยอด",
+              "AttachmentEvent": []
+            }
+          ],
+          "DocumentPurpose": {
+            "Id": 1,
+            "Name": "เพื่อพิจารณา",
+            "NameEn": "Review"
+          },
+          "ExecutiveOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 1,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+            "ParentId": 0,
+            "TokenId": "66"
+          },
+          "ReceiverType": {
+            "Id": 1,
+            "Name": "ผู้รับรายคน",
+            "NameEn": "Individual"
+          },
+          "RoleOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 1,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+            "ParentId": 0,
+            "TokenId": "66"
+          },
+          "UserOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 1,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+            "ParentId": 0,
+            "TokenId": "66"
+          }
+        },
+        "ReceiverPhase": {
+          "Id": 1,
+          "Name": "ผู้ตรวจสอบ/สั่งการ/ลงนาม",
+          "NameEn": "Process"
+        },
+        "ReceiverTargets": [],
+        "SenderInfo": {
+          "DocumentSendStatus": 1,
+          "Message": "",
+          "PositionName": "นักวิชาการคอมพิวเตอร์",
+          "SenderDate": [
+            {
+              "low": -682882742,
+              "high": 148827890,
+              "unsigned": false
+            },
+            420
+          ],
+          "SenderFullName": "นายธีรกิติ์ เกียรติเกษม",
+          "SenderIP": "127.0.0.1",
+          "SenderId": "6D2C2847-87E1-4AD3-BF9B-1DDAFC4FDD4E",
+          "SenderUser": "user004300052@cmu.ac.th",
+          "SenderUserFullName": "นายธีรกิติ์ เกียรติเกษม",
+          "SenderExecutiveOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 0,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "",
+            "ParentId": null,
+            "TokenId": ""
+          },
+          "SenderRoleOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 0,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "",
+            "ParentId": null,
+            "TokenId": ""
+          },
+          "SenderUserOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 0,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "",
+            "ParentId": null,
+            "TokenId": ""
+          }
+        },
+        "StaffDeleteReceiver": {
+          "DeleteStatus": 0,
+          "DeletedDate": null,
+          "DeletedIP": "",
+          "DeletedReason": "",
+          "DeletedRound": 0,
+          "DeletedUser": "",
+          "DeletedUserFullName": ""
+        }
+      },
+      {
+        "DocumentAction": 2,
+        "_id": "6a6c4d449022c8d5cf2ed041",
+        "Audit": {
+          "CreatedDate": [
+            {
+              "low": 808760876,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "CreatedIP": "127.0.0.1",
+          "CreatedUser": "user004300052@cmu.ac.th",
+          "UpdatedDate": [
+            {
+              "low": 901156778,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "UpdatedIP": "127.0.0.1",
+          "UpdatedUser": "user004300052@cmu.ac.th"
+        },
+        "OpinionRequestRouting": {
+          "CanceledDate": null,
+          "OpinionResponseStatus": 0,
+          "OpinionResponseStatusName": "รอให้ความคิดเห็น",
+          "ParentReceiverId": null,
+          "RequestRefId": "",
+          "RequestedDate": [
+            {
+              "low": 808724941,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "RoundRef": 0
+        },
+        "OpinionRequests": [],
+        "ReceiverInfo": {
+          "DocumentReceiverId": "6a6c4d449022c8d5cf2ed042",
+          "IsCompleteProcess": null,
+          "OrderDisplay": 0,
+          "PositionName": "นักจัดการงานทั่วไป",
+          "ReceiverEmail": "user000500682@cmu.ac.th",
+          "ReceiverFullName": "นางสาวอำนวน สิรินทิพย์",
+          "ReceiverId": "72E4A8EF-DD3D-4B52-97BE-027ADE0FE04E",
+          "RegistrationId": null,
+          "ApproveStatus": {
+            "Id": 0,
+            "Name": "",
+            "NameEn": ""
+          },
+          "DocumentApprovalStatus": {
+            "Id": 2,
+            "Name": "รอดำเนินการ",
+            "NameEn": "Pending"
+          },
+          "DocumentEvents": [],
+          "DocumentPurpose": {
+            "Id": 7,
+            "Name": "เพื่อทราบ",
+            "NameEn": "Acknowledge"
+          },
+          "ExecutiveOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 1,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+            "ParentId": 0,
+            "TokenId": "66"
+          },
+          "ReceiverType": {
+            "Id": 1,
+            "Name": "ผู้รับรายคน",
+            "NameEn": "Individual"
+          },
+          "RoleOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 1,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+            "ParentId": 0,
+            "TokenId": "66"
+          },
+          "UserOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 1,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "8410F162-6C76-4BBF-A5F4-1B863F2B5276",
+            "ParentId": 0,
+            "TokenId": "66"
+          }
+        },
+        "ReceiverPhase": {
+          "Id": 2,
+          "Name": "ผู้รับปลายทาง",
+          "NameEn": "Final"
+        },
+        "ReceiverTargets": [],
+        "SenderInfo": {
+          "DocumentSendStatus": 1,
+          "Message": "",
+          "PositionName": "นักวิชาการคอมพิวเตอร์",
+          "SenderDate": [
+            {
+              "low": 900550013,
+              "high": 148827919,
+              "unsigned": false
+            },
+            420
+          ],
+          "SenderFullName": "นายธีรกิติ์ เกียรติเกษม",
+          "SenderIP": "127.0.0.1",
+          "SenderId": "6D2C2847-87E1-4AD3-BF9B-1DDAFC4FDD4E",
+          "SenderUser": "user004300052@cmu.ac.th",
+          "SenderUserFullName": "นายธีรกิติ์ เกียรติเกษม",
+          "SenderExecutiveOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 0,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "",
+            "ParentId": null,
+            "TokenId": ""
+          },
+          "SenderRoleOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 0,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "",
+            "ParentId": null,
+            "TokenId": ""
+          },
+          "SenderUserOrganization": {
+            "EdocOrganizationId": 66,
+            "Level": 0,
+            "Name": "สำนักบริการเทคโนโลยีสารสนเทศ",
+            "NameEn": "",
+            "OrganizationHRId": "",
+            "ParentId": null,
+            "TokenId": ""
+          }
+        },
+        "StaffDeleteReceiver": {
+          "DeleteStatus": 0,
+          "DeletedDate": null,
+          "DeletedIP": "",
+          "DeletedReason": "",
+          "DeletedRound": 0,
+          "DeletedUser": "",
+          "DeletedUserFullName": ""
+        }
+      }
+    ]
+  },
+  "ReplyForwardEntries": [],
+  "Status": {
+    "CompletedDate": [
+      {
+        "low": 506999654,
+        "high": 148827918,
+        "unsigned": false
+      },
+      420
+    ],
+    "CompletedIP": "127.0.0.1",
+    "CompletedUser": "user004300052@cmu.ac.th",
+    "CompletionType": 2,
+    "PersonSubmittedDate": null,
+    "DocumentStatus": {
+      "Id": 4,
+      "Name": "เอกสารเสร็จสิ้น",
+      "NameEn": "Completed"
+    },
+    "PersonSubmitStatus": null,
+    "WorkflowStep": {
+      "Id": 5,
+      "Name": "เอกสารเสร็จสิ้น",
+      "NameEn": "Completed"
+    }
+  }
+}
