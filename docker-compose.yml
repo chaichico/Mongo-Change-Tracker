@@ -1,0 +1,12 @@
+services:
+  mongo-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${PORT:-4400}:${PORT:-4400}"
