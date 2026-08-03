@@ -21,10 +21,10 @@ Docker Compose จะรัน tracker app โดยใช้ค่าการ�
 ถ้า MongoDB รันอยู่บน host ให้ใช้ `host.docker.internal` เมื่อรันผ่าน Docker:
 
 ```env
-SOURCE_MONGO_URI=mongodb://root:your_password@host.docker.internal:27017/?authSource=admin
+SOURCE_MONGO_URI="MongoDB connection string"
 SOURCE_DB_NAME=your_source_db
 
-TRACKER_MONGO_URI=mongodb://root:your_password@host.docker.internal:27017/?authSource=admin
+TRACKER_MONGO_URI="MongoDB connection string"
 TRACKER_DB_NAME=mongo_tracker
 
 WATCH_COLLECTIONS=Documents,Orders
@@ -69,10 +69,10 @@ npm install
 เมื่อรันแบบ local ให้ใช้ `localhost` สำหรับ MongoDB ที่รันอยู่บนเครื่อง:
 
 ```env
-SOURCE_MONGO_URI=mongodb://root:your_password@localhost:27017/?authSource=admin
+SOURCE_MONGO_URI="MongoDB connection string"
 SOURCE_DB_NAME=your_source_db
 
-TRACKER_MONGO_URI=mongodb://root:your_password@localhost:27017/?authSource=admin
+TRACKER_MONGO_URI="MongoDB connection string"
 TRACKER_DB_NAME=mongo_tracker
 
 WATCH_COLLECTIONS=Documents,Orders
