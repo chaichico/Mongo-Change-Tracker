@@ -174,14 +174,18 @@
   .event-context-menu button:last-child:hover{ color:var(--update); }
   .menu-icon{ width:18px; color:var(--text-dim); font-family:var(--mono); font-size:13px; text-align:center; }
   .rename-overlay{ position:fixed; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(5,8,12,.78); backdrop-filter:blur(5px); }
-  .rename-dialog{ width:min(420px,100%); background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:0 18px 60px rgba(0,0,0,.55); overflow:hidden; }
+  .rename-dialog{ width:min(560px,100%); background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:0 18px 60px rgba(0,0,0,.55); overflow:hidden; }
   .rename-dialog::before{ content:""; display:block; height:3px; background:linear-gradient(90deg,var(--accent),var(--update)); }
-  .rename-body{ padding:20px; }
+  .rename-body{ padding:24px; }
   .rename-eyebrow{ margin-bottom:8px; color:var(--accent); font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.8px; }
   .rename-dialog h2{ margin:0; font-size:17px; font-weight:600; }
   .rename-description{ margin:7px 0 16px; color:var(--text-dim); font-size:12px; line-height:1.5; }
   .rename-input{ width:100%; padding:10px 11px; border-color:#354252; background:#0d1219; font-family:var(--mono); }
   .rename-input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(89,217,179,.12); }
+  .rename-history{ margin:0 0 14px; }
+  .rename-history-label{ display:block; margin-bottom:6px; color:var(--text-dim); font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.5px; }
+  .rename-history-select{ width:100%; padding:9px 10px; background:#0d1219; border-color:#354252; color:var(--text); }
+  .rename-history-select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(89,217,179,.12); }
   .rename-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
   .rename-actions button{ min-width:88px; }
   .action-dialog-overlay{ position:fixed; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(5,8,12,.78); backdrop-filter:blur(6px); }
@@ -265,6 +269,25 @@ const state = {
 const documentKey = (collection, documentId) => `${collection}:${documentId}`;
 function persistHiddenDocuments(){
   localStorage.setItem('mongo-tracker-hidden-documents', JSON.stringify([...state.hiddenDocuments]));
+}
+function readRenameHistory(){
+  try {
+    const value = JSON.parse(localStorage.getItem('mongo-tracker-rename-history') || '{}');
+    return value && typeof value === 'object' ? value : {};
+  } catch { return {}; }
+}
+state.renameHistory = readRenameHistory();
+function persistRenameHistory(){
+  localStorage.setItem('mongo-tracker-rename-history', JSON.stringify(state.renameHistory));
+}
+function rememberEventName(eventId, name){
+  const cleanName = String(name || '').trim();
+  if (!cleanName) return;
+  const key = String(eventId);
+  state.renameHistory[key] = [cleanName, ...(state.renameHistory[key] || [])]
+    .filter((value, index, values) => values.indexOf(value) === index)
+    .slice(0, 20);
+  persistRenameHistory();
 }
 
 function fmtTime(iso){
@@ -657,7 +680,7 @@ function showEventContextMenu(eventId, x, y){
   });
   document.body.appendChild(menu);
 }
-function requestEventName(currentName){
+function requestEventName(currentName, history){
   return new Promise(resolve => {
     const overlay = document.createElement('div');
     overlay.className = 'rename-overlay';
@@ -667,6 +690,7 @@ function requestEventName(currentName){
           <div class="rename-eyebrow">Event label</div>
           <h2 id="rename-title">Rename event</h2>
           <p class="rename-description">Give this timeline event a clear name for faster identification.</p>
+          ${history.length ? `<div class="rename-history"><label class="rename-history-label" for="rename-history-select">Previously used names</label><select class="rename-history-select" id="rename-history-select"><option value="">Choose a previous name…</option>${history.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}</select></div>` : ''}
           <input class="rename-input" type="text" maxlength="200" value="${escapeHtml(currentName)}" aria-label="Event name" />
           <div class="rename-actions">
             <button type="button" class="secondary" data-action="cancel">Cancel</button>
@@ -676,12 +700,16 @@ function requestEventName(currentName){
       </div>
     `;
     const input = overlay.querySelector('.rename-input');
+    const historySelect = overlay.querySelector('.rename-history-select');
     const finish = value => {
       overlay.remove();
       resolve(value);
     };
     overlay.querySelector('[data-action="cancel"]').addEventListener('click', () => finish(null));
     overlay.querySelector('[data-action="save"]').addEventListener('click', () => finish(input.value.trim()));
+    historySelect?.addEventListener('change', () => {
+      if (historySelect.value) { input.value = historySelect.value; input.focus(); input.select(); }
+    });
     overlay.addEventListener('click', event => {
       if (event.target === overlay) finish(null);
     });
@@ -698,7 +726,8 @@ async function renameEvent(eventId){
   const event = state.timelineEvents.get(String(eventId));
   if (!event) return;
   const currentName = event.displayName || event.methodName || '';
-  const name = await requestEventName(currentName);
+  const history = [...new Set((state.renameHistory[String(eventId)] || []).filter(Boolean))];
+  const name = await requestEventName(currentName, history);
   if (name === null) return;
   const response = await fetch(`/api/events/${encodeURIComponent(eventId)}`, {
     method:'PATCH',
@@ -711,6 +740,8 @@ async function renameEvent(eventId){
     return;
   }
   const updated = await response.json();
+  rememberEventName(eventId, currentName);
+  rememberEventName(eventId, name);
   state.timelineEvents.set(String(eventId), updated);
   await selectDocument(state.collection, state.documentId);
 }
